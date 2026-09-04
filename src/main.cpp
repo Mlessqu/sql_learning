@@ -6,8 +6,8 @@
 //Milestone 1: recreate file reading with server based table[x]
 //Milestone 2: simple cli credentials on success, db sends back data, print data[x]
 
-//milestone 3: 
-int main()
+//milestone 3:
+int main(int _arg_count, char** _arg_values)
 {
     constexpr const char* server_addr = "postgresql://postgres:mleko1235@127.0.0.1:5432/auth_service";
     try
@@ -29,7 +29,6 @@ int main()
         }
         tx.commit();
 
-        // std::cout << "Db returned" << row[0].as<int>() << std::endl;
     }
     catch (std::exception const& e)
     {
