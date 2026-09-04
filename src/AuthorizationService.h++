@@ -9,8 +9,12 @@ namespace fela
     class AuthorizationService
     {
     public:
-        AuthorizationService();
-        void handle_request();
-
+        AuthorizationService(DataBase& _data_base);
+        bool handle_request(ParsedData _http_request_data);
+    private:
+        bool create_account(ParsedData& _data);
+        bool log_in(ParsedData& _data);
+        bool log_out(ParsedData& _data);
+        DataBase& data_base_;
     };
 } // fela

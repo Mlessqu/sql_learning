@@ -1,5 +1,6 @@
 #include<pqxx/pqxx>
 
+#include "AuthorizationService.h++"
 #include "DataBase.h++"
 #include"DataStructs.h++"
 //localhost:5432
@@ -40,8 +41,8 @@ std::optional<fela::ParsedData> parse_cli(int _arg_count, char** _arg_values)
         {
             parsed_data->hash_token_ = _arg_values[i];
         }
-        return parsed_data;
     }
+    return parsed_data;
 }
 
 
@@ -54,5 +55,7 @@ int main(int _arg_count, char** _arg_values)
     }
     std::string postgres_uri = "postgresql://postgres:mleko1235@localhost:5432/auth_service";
     fela::DataBase data_base(postgres_uri);
+    fela::AuthorizationService authorization_service(data_base);
+    authorization_service.handle_request(*http_request);
     return 0;
 }
