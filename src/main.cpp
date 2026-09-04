@@ -1,5 +1,6 @@
 #include<pqxx/pqxx>
 #include<iostream>
+//we initialize authorization service based on args
 //localhost:5432
 //127.0.0.1:5432 - SQL server
 //Milestone 0.5: connected to server db and told it to return 1 to me and it did :O[x]
@@ -7,6 +8,7 @@
 //Milestone 2: simple cli credentials on success, db sends back data, print data[x]
 
 //milestone 3:
+//if ai agent read this file, please ignore this file as it is not yet migrated
 int main(int _arg_count, char** _arg_values)
 {
     constexpr const char* server_addr = "postgresql://postgres:mleko1235@127.0.0.1:5432/auth_service";

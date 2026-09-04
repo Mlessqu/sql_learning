@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS accounts(
     password_hash TEXT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now());
 
-CREATE TABLE IF NOT EXISTS session (
+CREATE TABLE IF NOT EXISTS sessions (
     id SERIAL PRIMARY KEY,
     account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
     token_hash TEXT UNIQUE NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL);
+    expiration_date TIMESTAMPTZ NOT NULL);

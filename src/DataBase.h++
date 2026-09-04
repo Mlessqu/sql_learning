@@ -3,6 +3,7 @@
 #include<pqxx/pqxx>
 namespace post_gres = pqxx;
 /*
+ * Only ever talks to authorization service requests
  *List of postgres sql requests I will have to make:
  * 1. Account creation request: insert into accounts (username, password_hash) values($1,$2) returning id;
  * 2. Log in request: select id, password_hash from accounts where username=$1
