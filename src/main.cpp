@@ -1,41 +1,58 @@
 #include<pqxx/pqxx>
-#include<iostream>
-//we initialize authorization service based on args
+
+#include "DataBase.h++"
+#include"DataStructs.h++"
 //localhost:5432
 //127.0.0.1:5432 - SQL server
-//Milestone 0.5: connected to server db and told it to return 1 to me and it did :O[x]
-//Milestone 1: recreate file reading with server based table[x]
-//Milestone 2: simple cli credentials on success, db sends back data, print data[x]
 
-//milestone 3:
-//if ai agent read this file, please ignore this file as it is not yet migrated
+//we simulate http requests with cli args for now
+
+
+
+std::optional<fela::ParsedData> parse_cli(int _arg_count, char** _arg_values)
+{
+    std::optional<fela::ParsedData> parsed_data = std::nullopt;
+    if (_arg_count > 4)
+    {
+        return std::nullopt;
+    }
+    if (_arg_count==0)
+    {
+        return std::nullopt;
+    }
+    //create acc 0, log in 1, log out 2
+    for (int i = 0; i < _arg_count; ++i)
+    {
+        if (i == 0)
+        {
+            int command = std::stoi(_arg_values[i]);
+            parsed_data->command_ = static_cast<fela::CliCommand>(command);
+        }
+        if (i == 1)
+        {
+            parsed_data->username_ = _arg_values[i];
+        }
+        if (i == 2)
+        {
+            parsed_data->password_ = _arg_values[i];
+        }
+        if (i == 3)
+        {
+            parsed_data->hash_token_ = _arg_values[i];
+        }
+        return parsed_data;
+    }
+}
+
+
 int main(int _arg_count, char** _arg_values)
 {
-    constexpr const char* server_addr = "postgresql://postgres:mleko1235@127.0.0.1:5432/auth_service";
-    try
+    std::optional<fela::ParsedData> http_request = parse_cli(_arg_count,_arg_values);
+    if (!http_request)
     {
-        pqxx::connection cx{server_addr};
-
-        pqxx::work tx{cx}; //transaction
-        std::cout << "Enter username:";
-        std::string username;
-        std::cin >> username;
-        std::cout << "Enter password:";
-        std::string password;
-        std::cin >> password;
-
-        auto result= tx.query<std::string,std::string>("select * from public.userbase where username=$1",pqxx::params{tx,username});
-        for (auto[username,password] : result)
-        {
-            std::cout << "Username:" << username << ", passwd:" << password << "\n";
-        }
-        tx.commit();
-
-    }
-    catch (std::exception const& e)
-    {
-        std::cerr << e.what() << std::endl;
         return 1;
     }
+    std::string postgres_uri = "postgresql://postgres:mleko1235@localhost:5432/auth_service";
+    fela::DataBase data_base(postgres_uri);
     return 0;
 }

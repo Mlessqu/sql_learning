@@ -14,6 +14,7 @@ add_executable(auth_service src/main.cpp
         src/HttpServer.h++
         src/DataBase.cpp
         src/DataBase.h++
+        src/DataStructs.h++
 )
 target_link_libraries(auth_service PRIVATE libpqxx::pqxx)
 
