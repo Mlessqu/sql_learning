@@ -1,8 +1,6 @@
 #pragma once
 
-namespace fela
-{
-    class Encryption
+namespace fela::encryption
     {
-    };
-} // fela
+
+    }// fela

@@ -1,6 +1,6 @@
 #include "Encryption.h++"
 
-namespace fela
+namespace fela::encryption
 {
     //implementation details here
 } // fela

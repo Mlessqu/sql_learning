@@ -12,6 +12,8 @@ add_executable(sql_learning src/main.cpp
         src/Encryption.h++
         src/HttpServer.cpp
         src/HttpServer.h++
+        src/DataBase.cpp
+        src/DataBase.h++
 )
 target_link_libraries(sql_learning PRIVATE libpqxx::pqxx)
 
