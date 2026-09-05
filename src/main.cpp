@@ -10,36 +10,47 @@
 
 
 
+constexpr int min_arg_count = 2;
+constexpr int max_arg_count = 5;
+constexpr int cmd_arg_idx = 1;
+constexpr int user_arg_idx = 2;
+constexpr int pass_arg_idx = 3;
+constexpr int token_arg_idx = 4;
+
 std::optional<fela::ParsedData> parse_cli(int _arg_count, char** _arg_values)
 {
-    std::optional<fela::ParsedData> parsed_data = std::nullopt;
-    if (_arg_count > 4)
+    if (_arg_count < min_arg_count || _arg_count > max_arg_count)
     {
         return std::nullopt;
     }
-    if (_arg_count==0)
-    {
-        return std::nullopt;
-    }
+
+    fela::ParsedData parsed_data{};
     //create acc 0, log in 1, log out 2
-    for (int i = 0; i < _arg_count; ++i)
+    for (int i = 1; i < _arg_count; ++i)
     {
-        if (i == 0)
+        if (i == cmd_arg_idx)
         {
-            int command = std::stoi(_arg_values[i]);
-            parsed_data->command_ = static_cast<fela::CliCommand>(command);
+            try
+            {
+                int command = std::stoi(_arg_values[i]);
+                parsed_data.command_ = static_cast<fela::CliCommand>(command);
+            }
+            catch (...)
+            {
+                return std::nullopt;
+            }
         }
-        if (i == 1)
+        if (i == user_arg_idx)
         {
-            parsed_data->username_ = _arg_values[i];
+            parsed_data.username_ = _arg_values[i];
         }
-        if (i == 2)
+        if (i == pass_arg_idx)
         {
-            parsed_data->password_ = _arg_values[i];
+            parsed_data.password_ = _arg_values[i];
         }
-        if (i == 3)
+        if (i == token_arg_idx)
         {
-            parsed_data->hash_token_ = _arg_values[i];
+            parsed_data.hash_token_ = _arg_values[i];
         }
     }
     return parsed_data;

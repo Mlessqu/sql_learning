@@ -3,7 +3,7 @@
 namespace fela
 {
     //implementation details here
-    DataBase::DataBase(std::string _connection_string)
+    DataBase::DataBase(std::string _connection_string) : connection_(_connection_string)
     {
     }
 
