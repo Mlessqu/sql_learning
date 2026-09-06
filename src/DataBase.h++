@@ -26,7 +26,7 @@ namespace fela
 
 
 
-        [[nodiscard]] DbResult validate_session(std::string _client_token);
+        [[nodiscard]] DbResult validate_token_session(std::string _client_token);
         [[nodiscard]] DbResult log_out(std::string _client_token);
     private:
         post_gres::connection connection_;

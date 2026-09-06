@@ -63,14 +63,13 @@ namespace fela
         std::string username = *_data.username_;
         std::string hashed_token = *_data.hash_token_;
         auto result = data_base_.log_out(hashed_token);
-        if (result.status_ == DatabaseStatus::ok)
+        if (result.status_ != DatabaseStatus::ok)
         {
-            return true;
+            std::cout << "eh? who are you?";
+            return false;
         }
-        return false;
-        //query to delete
-        //stub just passes data down
-        //query sql to delete, reason about result
+        std::cout << "ok, bye! logged out";
+        return true;
     }
 
 

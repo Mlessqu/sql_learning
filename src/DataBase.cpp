@@ -47,17 +47,18 @@ namespace fela
         DbResult result;
         try
         {
-            auto log_in_result = log_in_work.exec("select id, password_hash from accounts where username = $1", params).one_row();
+            auto log_in_result = log_in_work.exec("select id, password_hash from accounts where username = $1", params).
+                                             one_row();
             std::tuple<int, std::string> tuple = log_in_result.as<int, std::string>();
             result.status_ = DatabaseStatus::ok;
             result.acc_id_ = get<int>(tuple);
-            result.acc_pass_hash_= get<std::string>(tuple);
+            result.acc_pass_hash_ = get<std::string>(tuple);
             log_in_work.commit();
         }
         catch (const std::exception& e)
         {
             std::cerr << e.what() << "\n";
-            result.status_ =DatabaseStatus::db_error;
+            result.status_ = DatabaseStatus::db_error;
         }
         return result;
     }
@@ -66,16 +67,18 @@ namespace fela
     DbResult DataBase::create_session(int _acc_id, std::string _created_token)
     {
         pqxx::work create_session_work{connection_};
-        pqxx::params params{_acc_id,_created_token};
+        pqxx::params params{_acc_id, _created_token};
         DbResult result;
         try
         {
-            auto query = create_session_work.exec("insert into sessions(account_id, tokehn_hash, expiration_date)"
-                                                  " values($1,$2,now() + interval + '5 mins' returning token_hash",params).one_field();
+            auto query = create_session_work.exec("insert into sessions(account_id, token_hash, expiration_date)"
+                                                  " values($1,$2,now() + interval '5 mins') returning token_hash",
+                                                  params).one_field();
             result.status_ = DatabaseStatus::ok;
-            result.session_token_= query.as<std::string>();
-            return result;
-        }catch (const std::exception &e)
+            result.session_token_ = query.as<std::string>();
+            create_session_work.commit();
+        }
+        catch (const std::exception& e)
         {
             std::cout << e.what() << "\n";
             result.status_ = DatabaseStatus::db_error;
@@ -84,14 +87,42 @@ namespace fela
     }
 
 
-    DbResult DataBase::validate_session(std::string _client_token)
+    DbResult DataBase::validate_token_session(std::string _client_token)
     {
-        return DbResult{.status_ = DatabaseStatus::ok};
+        pqxx::work validate_session_work{connection_};
+        pqxx::params params{_client_token};
+        DbResult result;
+        try
+        {
+            auto query = validate_session_work.exec(
+                "select account_id from sessions where token_hash = $1 and expiration_date > now()", params);
+            result.status_ = DatabaseStatus::ok;
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << e.what() << "\n";
+            result.status_ = DatabaseStatus::db_error;
+        }
     }
 
 
     DbResult DataBase::log_out(std::string _client_token)
     {
-        return DbResult{.status_ = DatabaseStatus::ok};
+        pqxx::work create_log_out_work{connection_};
+        pqxx::params params{_client_token};
+        DbResult result;
+        try
+        {
+            auto query = create_log_out_work.exec(
+                "delete from sessions where token_hash = $1", params);
+            result.status_ = DatabaseStatus::ok;
+            create_log_out_work.commit();
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << e.what() << "\n";
+            result.status_ = DatabaseStatus::db_error;
+        }
+        return result;
     }
 } // fela
