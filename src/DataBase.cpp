@@ -115,7 +115,13 @@ namespace fela
         {
             auto query = create_log_out_work.exec(
                 "delete from sessions where token_hash = $1", params);
-            result.status_ = DatabaseStatus::ok;
+            if (query.affected_rows()==1)
+            {
+                result.status_ = DatabaseStatus::ok;
+            }else
+            {
+                result.status_ = DatabaseStatus::not_found;
+            }
             create_log_out_work.commit();
         }
         catch (const std::exception& e)
