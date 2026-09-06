@@ -4,7 +4,7 @@ namespace fela::encryption
 {
     std::string hash_data(const std::string& _string)
     {
-        return _string;
+        return _string +"hashed";
     }
 
 

@@ -36,6 +36,7 @@ namespace fela
         std::optional<int> session_id_{};
         std::optional<int> account_id_ref_{};
         std::optional<std::string> exp_date_{};
+        std::optional<std::string> session_token_{};
 
     };
 }

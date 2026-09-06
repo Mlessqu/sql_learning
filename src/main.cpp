@@ -10,25 +10,25 @@
 
 
 
-constexpr int min_arg_count = 2;
-constexpr int max_arg_count = 5;
-constexpr int cmd_arg_idx = 1;
-constexpr int user_arg_idx = 2;
-constexpr int pass_arg_idx = 3;
-constexpr int token_arg_idx = 4;
+constexpr int MIN_ARG_COUNT = 2;
+constexpr int MAX_ARG_COUNT = 5;
+constexpr int CMD_ARG_IDX = 1;
+constexpr int USER_ARG_IDX = 2;
+constexpr int PASS_ARG_IDX = 3;
+constexpr int TOKEN_ARG_IDX = 4;
 
 std::optional<fela::ParsedData> parse_cli(int _arg_count, char** _arg_values)
 {
-    if (_arg_count < min_arg_count || _arg_count > max_arg_count)
+    if (_arg_count < MIN_ARG_COUNT || _arg_count > MAX_ARG_COUNT)
     {
         return std::nullopt;
     }
 
     fela::ParsedData parsed_data{};
-    //create acc 0, log in 1, log out 2
+
     for (int i = 1; i < _arg_count; ++i)
     {
-        if (i == cmd_arg_idx)
+        if (i == CMD_ARG_IDX)
         {
             try
             {
@@ -40,15 +40,15 @@ std::optional<fela::ParsedData> parse_cli(int _arg_count, char** _arg_values)
                 return std::nullopt;
             }
         }
-        if (i == user_arg_idx)
+        if (i == USER_ARG_IDX)
         {
             parsed_data.username_ = _arg_values[i];
         }
-        if (i == pass_arg_idx)
+        if (i == PASS_ARG_IDX)
         {
             parsed_data.password_ = _arg_values[i];
         }
-        if (i == token_arg_idx)
+        if (i == TOKEN_ARG_IDX)
         {
             parsed_data.hash_token_ = _arg_values[i];
         }
