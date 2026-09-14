@@ -67,6 +67,6 @@ int main(int _arg_count, char** _arg_values)
     std::string postgres_uri = "postgresql://postgres:mleko1235@localhost:5432/auth_service";
     fela::DataBase data_base(postgres_uri);
     fela::AuthorizationService authorization_service(data_base);
-    authorization_service.handle_request(*http_request);
+
     return 0;
 }

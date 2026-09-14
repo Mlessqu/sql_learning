@@ -20,6 +20,7 @@ namespace fela
     public:
         DataBase(std::string _connection_string);
 
+
         [[nodiscard]] DbResult create_account(std::string _username, std::string _pass_hash);
         [[nodiscard]] DbResult log_in_request(std::string _username);
         [[nodiscard]] DbResult create_session(int _acc_id, std::string _created_token);
@@ -27,6 +28,7 @@ namespace fela
 
 
         [[nodiscard]] DbResult validate_token_session(std::string _client_token);
+
         [[nodiscard]] DbResult log_out(std::string _client_token);
     private:
         post_gres::connection connection_;

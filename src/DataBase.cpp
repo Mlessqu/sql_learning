@@ -93,16 +93,27 @@ namespace fela
         DbResult result;
         try
         {
-            auto query = validate_session_work.exec(
-                "select account_id from sessions where token_hash = $1 and expiration_date > now()", params);
+            std::optional<int> query_result = std::nullopt;
+            query_result = validate_session_work.exec(
+                "select account_id from sessions where token_hash = $1 and expiration_date > now()",
+                params).one_field().as<int>();
+            if (query_result)
+            {
+                result.acc_id_ = *query_result;
+                result.status_ = DatabaseStatus::ok;
+            }
+            else
+            {
+                result.status_ = DatabaseStatus::not_found;
+            }
             validate_session_work.commit();
-            result.status_ = DatabaseStatus::ok;
         }
         catch (const std::exception& e)
         {
             std::cerr << e.what() << "\n";
             result.status_ = DatabaseStatus::db_error;
         }
+        return result;
     }
 
 
@@ -115,10 +126,11 @@ namespace fela
         {
             auto query = create_log_out_work.exec(
                 "delete from sessions where token_hash = $1", params);
-            if (query.affected_rows()==1)
+            if (query.affected_rows() == 1)
             {
                 result.status_ = DatabaseStatus::ok;
-            }else
+            }
+            else
             {
                 result.status_ = DatabaseStatus::not_found;
             }

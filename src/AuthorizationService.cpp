@@ -10,29 +10,13 @@ namespace fela
     }
 
 
-    bool AuthorizationService::handle_request(ParsedData _request_data)
-    {
-        switch (_request_data.command_)
-        {
-        case CliCommand::create_account:
-            return create_account(_request_data);
-        case CliCommand::log_in:
-            return log_in(_request_data);
-        case CliCommand::log_out:
-            return log_out(_request_data);
-        default:
-            return false;
-        }
-    }
 
 
-    bool AuthorizationService::create_account(ParsedData& _data)
+
+    bool AuthorizationService::create_account(const std::string& _username, const std::string& _password)
     {
-        
-        //stub just passes data down, prepares needed variables,
-        std::string username = *_data.username_;
-        std::string pass_hash = encryption::hash_data(*_data.password_);
-        auto result= data_base_.create_account(username,pass_hash);
+
+        auto result= data_base_.create_account(_username,_password);
         if (result.status_ == DatabaseStatus::ok)
         {
             return true;
@@ -41,13 +25,12 @@ namespace fela
     }
 
 
-    bool AuthorizationService::log_in(ParsedData& _data)
+    bool AuthorizationService::log_in(const std::string& _username, const std::string& _password)
     {
-        std::string client_username = *_data.username_;
-        std::string client_pass_hash = encryption::hash_data(*_data.password_);
-        auto db_result = data_base_.log_in_request(client_username);
+
+        auto db_result = data_base_.log_in_request(_username);
         int acc_id = *db_result.acc_id_;
-        if (*db_result.acc_pass_hash_ == client_pass_hash)
+        if (*db_result.acc_pass_hash_ == _password)
         {
             auto created_token = encryption::hash_data("dummyvalue");
             auto result = data_base_.create_session(acc_id,created_token);
@@ -58,11 +41,10 @@ namespace fela
     }
 
 
-    bool AuthorizationService::log_out(ParsedData& _data)
+    bool AuthorizationService::log_out(const std::string& _token)
     {
-        std::string username = *_data.username_;
-        std::string hashed_token = *_data.hash_token_;
-        auto result = data_base_.log_out(hashed_token);
+
+        auto result = data_base_.log_out(_token);
         if (result.status_ != DatabaseStatus::ok)
         {
             std::cout << "eh? who are you?";

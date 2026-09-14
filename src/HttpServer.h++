@@ -1,20 +1,29 @@
 #pragma once
 /*
  * Responsibility:
- * listen to client requests over encrypted tls,
+ * listen to client requests over encrypted open ssl,
  * validate client inputs
  * talks to authorization service, and decryption maybe? I am not yet sure if I should decrypt here or within authorization service
+ * TODO:
+ *
 
  */
+//#define CPPHTTPLIB_OPENSSL_SUPPORT
+#include<httplib.h>
 namespace fela
 {
+    class AuthorizationService;
+
     class HttpServer
     {
     public:
-        //TODO: we completely ignore http server for now and simulate requests with cli args
-        HttpServer();
-        void login_request();//stub
-        void create_account_request();
-
+        HttpServer(AuthorizationService& _auth_service);
+        bool login_request(std::string _username, std::string _password);
+        bool logout_request(std::string _token);
+        bool create_account_request(std::string _username, std::string _password);
+    private:
+        httplib::Server server_;
+        //TODO: change to http with ssl later, no encryption for testing
+        fela::AuthorizationService& auth_service_;
     };
 } // fela

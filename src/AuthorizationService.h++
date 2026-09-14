@@ -10,11 +10,11 @@ namespace fela
     {
     public:
         AuthorizationService(DataBase& _data_base);
-        bool handle_request(ParsedData _http_request_data);
+
+        bool create_account(const std::string& _username, const std::string& _password);
+        bool log_in(const std::string& _username, const std::string& _password);
+        bool log_out(const std::string& _token);
     private:
-        bool create_account(ParsedData& _data);
-        bool log_in(ParsedData& _data);
-        bool log_out(ParsedData& _data);
         DataBase& data_base_;
     };
 } // fela
