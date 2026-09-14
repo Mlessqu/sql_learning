@@ -18,9 +18,11 @@ namespace fela
     {
     public:
         HttpServer(AuthorizationService& _auth_service);
-        bool login_request(std::string _username, std::string _password);
-        bool logout_request(std::string _token);
-        bool create_account_request(std::string _username, std::string _password);
+        httplib::Response login_request(std::string _username, std::string _password);
+        httplib::Response logout_request(std::string _token);
+        httplib::Response create_account_request(std::string _username, std::string _password);
+        bool start(int _port);
+        void stop();
     private:
         httplib::Server server_;
         //TODO: change to http with ssl later, no encryption for testing

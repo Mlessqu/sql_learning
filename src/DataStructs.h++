@@ -10,13 +10,6 @@ namespace fela
         log_out
     };
 
-    struct ParsedData
-    {
-        CliCommand command_{};
-        std::optional<std::string> username_{};
-        std::optional<std::string> password_{};
-        std::optional<std::string> hash_token_{};
-    };
     enum class DatabaseStatus
     {
         ok,

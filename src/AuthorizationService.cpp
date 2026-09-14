@@ -10,34 +10,34 @@ namespace fela
     }
 
 
-
-
-
     bool AuthorizationService::create_account(const std::string& _username, const std::string& _password)
     {
 
         auto result= data_base_.create_account(_username,_password);
         if (result.status_ == DatabaseStatus::ok)
         {
-            return true;
+
         }
         return false;
     }
 
 
-    bool AuthorizationService::log_in(const std::string& _username, const std::string& _password)
+    std::optional<std::string> AuthorizationService::log_in(const std::string& _username, const std::string& _password)
     {
-
-        auto db_result = data_base_.log_in_request(_username);
+        DbResult db_result = data_base_.log_in_request(_username);
+        if (!db_result.acc_id_)
+        {
+            return std::nullopt;
+        }
         int acc_id = *db_result.acc_id_;
         if (*db_result.acc_pass_hash_ == _password)
         {
-            auto created_token = encryption::hash_data("dummyvalue");
+            auto created_token = encryption::hash_data("dummycookie");
             auto result = data_base_.create_session(acc_id,created_token);
             std::cout << "Logged in!, here's your cookie:" << created_token;
-            return true;
+            return created_token;
         }
-        return false;
+        return std::nullopt;
     }
 
 
