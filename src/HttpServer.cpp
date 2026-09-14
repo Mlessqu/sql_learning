@@ -10,27 +10,26 @@ namespace fela
 
     fela::HttpServer::HttpServer(AuthorizationService& _auth_service) : auth_service_(_auth_service)
     {
-        //init server here
+
         server_.Post("/register", [this](const httplib::Request& _request, httplib::Response& _response)
         {
             std::string user = _request.get_param_value("username");
             std::string pass = _request.get_param_value("password");
-            auto response = create_account_request(user, pass);
-            _response = response;
+            _response = create_account_request(user, pass);
 
-            //parse and return response into response args
+
         });
         server_.Post("/login", [this](const httplib::Request& _request, httplib::Response& _response)
         {
             std::string username = _request.get_param_value("username");
             std::string password = _request.get_param_value("password");
-            auto cookie = this->login_request(username, password);
-            _response = cookie;
+            _response = this->login_request(username, password);
+
         });
         server_.Post("/logout", [this](const httplib::Request& _request, httplib::Response& _response)
         {
-            auto cookie = _request.get_param_value("cookie");
-            auto result = this->logout_request(cookie);
+            std::string token = _request.get_header_value("Authorization");
+            _response = this->logout_request(token);
         });
     }
 
@@ -38,14 +37,21 @@ namespace fela
     httplib::Response fela::HttpServer::login_request(std::string _username, std::string _password)
     {
         httplib::Response response;
-        auto result = auth_service_.log_in(_username, _password);
-        if (result)
+        auto token = auth_service_.log_in(_username, _password);
+        if (token)
         {
-
+            response.status = REQUEST_SUCCESS;
+            std::string header_value = "token=";
+            header_value+= *token;
+            header_value+= "; Path=/; HttpOnly";
+            response.set_header("Set-Cookie", header_value);
+            response.set_content("Login sucess", "text/plain");
         }else
         {
-
+            response.status = REQUEST_FAILED;
+            response.set_content("Login failed", "text/plain");
         }
+        return response;
     }
 
 
@@ -63,6 +69,7 @@ namespace fela
             response.status = REQUEST_FAILED;
             response.set_content("Who are you again?", "text/plain");
         }
+        return response;
     }
 
 

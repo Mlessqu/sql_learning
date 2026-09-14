@@ -16,7 +16,7 @@ namespace fela
         auto result= data_base_.create_account(_username,_password);
         if (result.status_ == DatabaseStatus::ok)
         {
-
+                return true;
         }
         return false;
     }
