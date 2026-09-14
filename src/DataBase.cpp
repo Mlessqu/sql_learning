@@ -12,7 +12,6 @@
  */
 namespace fela
 {
-    //implementation details here
     DataBase::DataBase(std::string _connection_string) : connection_(_connection_string)
     {
     }
@@ -96,6 +95,7 @@ namespace fela
         {
             auto query = validate_session_work.exec(
                 "select account_id from sessions where token_hash = $1 and expiration_date > now()", params);
+            validate_session_work.commit();
             result.status_ = DatabaseStatus::ok;
         }
         catch (const std::exception& e)

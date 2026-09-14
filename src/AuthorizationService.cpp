@@ -28,7 +28,7 @@ namespace fela
 
     bool AuthorizationService::create_account(ParsedData& _data)
     {
-
+        
         //stub just passes data down, prepares needed variables,
         std::string username = *_data.username_;
         std::string pass_hash = encryption::hash_data(*_data.password_);
