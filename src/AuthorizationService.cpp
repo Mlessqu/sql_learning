@@ -12,8 +12,7 @@ namespace fela
 
     bool AuthorizationService::create_account(const std::string& _username, const std::string& _password)
     {
-
-        auto result= data_base_.create_account(_username,_password);
+        auto result= data_base_.create_account(_username,encryption::encrypt_password(_password));
         if (result.status_ == DatabaseStatus::ok)
         {
                 return true;
@@ -30,10 +29,15 @@ namespace fela
             return std::nullopt;
         }
         int acc_id = *db_result.acc_id_;
-        if (*db_result.acc_pass_hash_ == _password)
+        if (!db_result.acc_pass_hash_)
         {
-            auto created_token = encryption::hash_data("dummycookie");
-            auto result = data_base_.create_session(acc_id,created_token);
+            return std::nullopt;
+        }
+
+        if (encryption::verify_password(_password, *db_result.acc_pass_hash_))
+        {
+            auto created_token = encryption::generate_token();
+            auto result = data_base_.create_session(acc_id, created_token);
             std::cout << "Logged in!, here's your cookie:" << created_token;
             return created_token;
         }

@@ -4,6 +4,7 @@ project(auth_service)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(libpqxx REQUIRED)
+find_package(OpenSSL REQUIRED)
 
 add_executable(auth_service src/main.cpp
         src/AuthorizationService.cpp
@@ -16,5 +17,5 @@ add_executable(auth_service src/main.cpp
         src/DataBase.h++
         src/DataStructs.h++
 )
-target_link_libraries(auth_service PRIVATE libpqxx::pqxx)
+target_link_libraries(auth_service PRIVATE libpqxx::pqxx OpenSSL::Crypto)
 

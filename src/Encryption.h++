@@ -1,9 +1,16 @@
 #pragma once
+#include <optional>
 #include <string>
-//talks to: AuthorizationService, HttpServer
+
+//talks to: AuthorizationService,
 //bundles helper functions that encrypts data
 namespace fela::encryption
 {
-//TODO:: for now it's just function returning same string back
-    std::string hash_data(const std::string& _string);
+
+    /**
+     * @return unique hash token to manage active sessions
+     */
+    std::string generate_token();
+    std::string encrypt_password(const std::string& _password);
+    bool verify_password(const std::string& _password, const std::string& _stored_hash);
 } // fela
