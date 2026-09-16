@@ -8,7 +8,7 @@ namespace fela
 {
     constexpr int REQUEST_SUCCESS = 200;
     constexpr int REQUEST_FAILED = 400;
-    constexpr int ANAUTHORIZED = 401;
+    constexpr int UNAUTHORIZED = 401;
     constexpr int DUPLICATE_USERNAME = 409;
     constexpr int REQUEST_NOT_FOUND = 404;
 
@@ -19,23 +19,21 @@ namespace fela
 
         server_.Post("/register", [this](const httplib::Request& _request, httplib::Response& _response)
         {
-            //read json
-            //parse json
-            //validate input
-            //pass into auth service
+
 
             std::string user = _request.get_param_value("username");
             std::string pass = _request.get_param_value("password");
             _response = create_account_request(user, pass);
-
-
         });
         server_.Post("/login", [this](const httplib::Request& _request, httplib::Response& _response)
         {
-            //read json -> parse json -> validate input -> call auth service
 
             std::string username = _request.get_param_value("username");
             std::string password = _request.get_param_value("password");
+            if (username.empty()||password.empty())
+            {
+             _response.set_content("Invalid request", "text/plain");
+            }
             _response = this->login_request(username, password);
 
         });
@@ -43,6 +41,10 @@ namespace fela
         {
             std::string token = _request.get_header_value("Authorization");
             _response = this->logout_request(token);
+        });
+        server_.Post("/me",[this](const httplib::Request& _request,httplib::Response& _response)
+        {
+
         });
     }
 
@@ -54,16 +56,31 @@ namespace fela
         if (token)
         {
             response.status = REQUEST_SUCCESS;
-            std::string header_value = "token=";
-            header_value+= *token;
-            header_value+= "; Path=/; HttpOnly";
-            response.set_header("Set-Cookie", header_value);
-            response.set_content("Login sucess", "text/plain");
+            std::string response_value = "Login success, token= " + *token + "\n";
+
+            response.set_content(response_value, "text/plain");
         }else
         {
             response.status = REQUEST_FAILED;
             response.set_content("Login failed", "text/plain");
         }
+        return response;
+    }
+
+
+    httplib::Response HttpServer::request_username(std::string _token)
+    {
+        httplib::Response response;
+        std::optional<std::string> request_result = auth_service_.session_username(_token);
+        if (!request_result)
+        {
+            response.status = UNAUTHORIZED;
+            return response;
+        }
+        response.status = REQUEST_SUCCESS;
+        std::string response_value = "Your username is: ";
+        response_value+= *request_result;
+        response.set_content(response_value,"text/plain");
         return response;
     }
 

@@ -9,10 +9,6 @@ namespace fela::encryption
     constexpr int HASH_LEN = 32;
     constexpr int PBKDF2_ITERATIONS = 100'000;
 
-    std::string hash_data(const std::string& _string)
-    {
-        return _string + "hashed";
-    }
 
 
     bool verify_password(const std::string& _password, const std::string& _stored_hash)
@@ -83,6 +79,26 @@ namespace fela::encryption
         }
         return salt_hex + ":" + hash_hex;
     }
+
+
+    std::string encrypt_token(const std::string& _raw_token)
+    {
+        //SHA-256
+        EVP_MD_CTX* context = EVP_MD_CTX_new();
+        EVP_DigestInit_ex(context, EVP_sha256(),nullptr);
+        EVP_DigestUpdate(context, _raw_token.data(),_raw_token.size());
+        unsigned char encrypted_token[HASH_LEN];
+        EVP_DigestFinal_ex(context,encrypted_token,nullptr);
+        EVP_MD_CTX_free(context);
+        std::string token_hex;
+        for (int i=0; i< HASH_LEN;++i)
+        {
+            token_hex+= std::format("{:02x}", encrypted_token[i]);
+        }
+        return token_hex;
+    }
+
+
 
 
     //implementation details here

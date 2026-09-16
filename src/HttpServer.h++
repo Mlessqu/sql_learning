@@ -21,6 +21,7 @@ namespace fela
         httplib::Response login_request(std::string _username, std::string _password);
         httplib::Response logout_request(std::string _token);
         httplib::Response create_account_request(std::string _username, std::string _password);
+        httplib::Response request_username(std::string _token);
         void start(int _port);
         void stop();
     private:
