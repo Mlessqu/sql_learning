@@ -33,6 +33,7 @@ namespace fela
             if (username.empty()||password.empty())
             {
              _response.set_content("Invalid request", "text/plain");
+                return;
             }
             _response = this->login_request(username, password);
 
@@ -44,7 +45,8 @@ namespace fela
         });
         server_.Post("/me",[this](const httplib::Request& _request,httplib::Response& _response)
         {
-
+            std::string token = _request.get_header_value("Authorization");
+            _response = this->request_username(token);
         });
     }
 

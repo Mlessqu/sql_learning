@@ -65,8 +65,8 @@ namespace fela
         if (encryption::verify_password(_password, *db_result.acc_pass_hash_))
         {
             auto created_token = encryption::generate_token();
-            auto result = data_base_.insert_session(acc_id, created_token);
-            std::cout << "Logged in!, here's your cookie:" << created_token;
+            std::string encrypted_token = encryption::encrypt_token(created_token);
+            auto result = data_base_.insert_session(acc_id, encrypted_token);
             return created_token;
         }
         return std::nullopt;

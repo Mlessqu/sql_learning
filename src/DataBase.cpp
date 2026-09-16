@@ -125,7 +125,7 @@ namespace fela
         DbResult result;
         try
         {
-                std::optional query_result = find_user_work.exec("select username from accounts where id =$1").one_field().as<std::string>();
+                std::optional query_result = find_user_work.exec("select username from accounts where id =$1",params).one_field().as<std::string>();
             result.acc_user_ = query_result;
             result.status_ = DatabaseStatus::ok;
             find_user_work.commit();
