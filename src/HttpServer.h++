@@ -24,9 +24,7 @@ namespace fela
         void start(int _port);
         void stop();
     private:
-        // httplib::Server server_;
         httplib::SSLServer server_;
-        //TODO: change to http with ssl later, no encryption for testing
-        fela::AuthorizationService& auth_service_;
+        AuthorizationService& auth_service_;
     };
 } // fela

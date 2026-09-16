@@ -19,6 +19,11 @@ namespace fela
 
         server_.Post("/register", [this](const httplib::Request& _request, httplib::Response& _response)
         {
+            //read json
+            //parse json
+            //validate input
+            //pass into auth service
+
             std::string user = _request.get_param_value("username");
             std::string pass = _request.get_param_value("password");
             _response = create_account_request(user, pass);
@@ -27,6 +32,8 @@ namespace fela
         });
         server_.Post("/login", [this](const httplib::Request& _request, httplib::Response& _response)
         {
+            //read json -> parse json -> validate input -> call auth service
+
             std::string username = _request.get_param_value("username");
             std::string password = _request.get_param_value("password");
             _response = this->login_request(username, password);
