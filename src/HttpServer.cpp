@@ -1,14 +1,20 @@
 #include "HttpServer.h++"
 
+#include <filesystem>
+
 #include "AuthorizationService.h++"
 
 namespace fela
 {
     constexpr int REQUEST_SUCCESS = 200;
     constexpr int REQUEST_FAILED = 400;
+    constexpr int ANAUTHORIZED = 401;
+    constexpr int DUPLICATE_USERNAME = 409;
+    constexpr int REQUEST_NOT_FOUND = 404;
 
-
-    fela::HttpServer::HttpServer(AuthorizationService& _auth_service) : auth_service_(_auth_service)
+    const char* CERT_PATH = "/home/missqu/projects/sql_learning/cert.pem";
+    const char* KEY_PATH = "/home/missqu/projects/sql_learning/key.pem";
+    fela::HttpServer::HttpServer(AuthorizationService& _auth_service) : auth_service_(_auth_service), server_(CERT_PATH,KEY_PATH)
     {
 
         server_.Post("/register", [this](const httplib::Request& _request, httplib::Response& _response)
@@ -37,7 +43,7 @@ namespace fela
     httplib::Response fela::HttpServer::login_request(std::string _username, std::string _password)
     {
         httplib::Response response;
-        auto token = auth_service_.log_in(_username, _password);
+        std::optional<std::string> token = auth_service_.log_in(_username, _password);
         if (token)
         {
             response.status = REQUEST_SUCCESS;
@@ -91,8 +97,13 @@ namespace fela
     }
 
 
-    bool fela::HttpServer::start(int _port)
+    void fela::HttpServer::start(int _port)
     {
+        if (!server_.is_valid())
+        {
+            std::cerr << "Server failed to run, check fo correct path" << std::filesystem::current_path() << "\n";
+            return;
+        }
         constexpr char* listen_ip = "0.0.0.0";
         server_.listen(listen_ip, _port);
     }

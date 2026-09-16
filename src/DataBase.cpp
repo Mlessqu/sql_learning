@@ -38,7 +38,6 @@ namespace fela
         return db_result;
     }
 
-
     DbResult DataBase::log_in_request(std::string _username)
     {
         pqxx::work log_in_work{connection_};

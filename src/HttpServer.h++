@@ -8,7 +8,7 @@
  *
 
  */
-//#define CPPHTTPLIB_OPENSSL_SUPPORT
+#define CPPHTTPLIB_OPENSSL_SUPPORT
 #include<httplib.h>
 namespace fela
 {
@@ -21,10 +21,11 @@ namespace fela
         httplib::Response login_request(std::string _username, std::string _password);
         httplib::Response logout_request(std::string _token);
         httplib::Response create_account_request(std::string _username, std::string _password);
-        bool start(int _port);
+        void start(int _port);
         void stop();
     private:
-        httplib::Server server_;
+        // httplib::Server server_;
+        httplib::SSLServer server_;
         //TODO: change to http with ssl later, no encryption for testing
         fela::AuthorizationService& auth_service_;
     };
