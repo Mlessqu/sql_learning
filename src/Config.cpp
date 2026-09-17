@@ -1,16 +1,14 @@
 #include "Config.h++"
 
 #include <fstream>
-#include <httplib.h>
+#include <iostream>
 
 namespace fela
 {
-    std::filesystem::path CONFIG_PATH = "fela.conf";
-
     constexpr char SEPARATOR = '=';
     constexpr char COMMENT_CHARACTER = '#';
-    constexpr std::string WHITE_CHARACTERS = " '\t\r\n";
-
+    constexpr std::string_view WHITE_CHARACTERS = " \t\r\n";
+    constexpr int EXPECTED_CONFIG_ENTRIES = 5;
 
     std::string_view trim_whitespaces(std::string_view _str_view)
     {
@@ -20,29 +18,8 @@ namespace fela
         return _str_view.substr(start_pos, end_pos - start_pos + 1);
     }
 
-
-    std::optional<Config> parse_config(std::ifstream& _file_stream)
-    {
-        Config config;
-        for (std::string line; std::getline(_file_stream, line);)
-        {
-            std::string_view trimmed_line = trim_whitespaces(line);
-            const size_t separator_pos = line.find(SEPARATOR);
-
-
-            if (trimmed_line.empty()) continue;
-            if (trimmed_line.starts_with(COMMENT_CHARACTER)) continue;
-            if (separator_pos == std::string_view::npos) continue;
-            std::string_view key = trimmed_line.substr(0, separator_pos);
-            std::string_view value = trimmed_line.substr(separator_pos + 1);
-            update_config(key,value);
-        }
-    }
-
-
     bool update_config(Config& _config, const std::string_view& _key, const std::string_view& _val)
     {
-        bool updated = false;
         if (_key == "db_uri")
         {
             _config.db_uri_ = _val;
@@ -50,22 +27,31 @@ namespace fela
         }
         if (_key == "port")
         {
-            std::string temp(_val);
-            _config.port_ = std::stoi(temp);
-            return true;
+            try
+            {
+                _config.port_ = std::stoi(std::string(_val));
+                return true;
+            }
+            catch (...)
+            {
+                std::cerr << "Config error: 'port' must be valid integer, got '" << _val << "'\n";
+                return false;
+            }
         }
         if (_key == "ssl")
         {
-            if (_key == "true" || _key == "1")
+            if (_val == "true" || _val == "1")
             {
                 _config.use_ssl_ = true;
                 return true;
             }
-            if (_key == "false" || _key == "0")
+            if (_val == "false" || _val == "0")
             {
                 _config.use_ssl_ = false;
                 return true;
             }
+            std::cerr << "Config error: 'ssl' must be true/false or 1/0, got '" << _val << "'\n";
+            return false;
         }
         if (_key == "key_path")
         {
@@ -77,21 +63,66 @@ namespace fela
             _config.cert_path_ = _val;
             return true;
         }
+
+        std::cerr << "Config error: Unknown key '" << _key << "'\n";
         return false;
     }
 
+    std::optional<Config> parse_config(std::ifstream& _file_stream)
+    {
+        Config config;
+        int updates = 0;
+        int line_number = 0;
+
+        for (std::string line; std::getline(_file_stream, line);)
+        {
+            ++line_number;
+            std::string_view trimmed_line = trim_whitespaces(line);
+
+            if (trimmed_line.empty() || trimmed_line.starts_with(COMMENT_CHARACTER))
+            {
+                continue;
+            }
+
+            const size_t separator_pos = trimmed_line.find(SEPARATOR);
+            if (separator_pos == std::string_view::npos)
+            {
+                std::cerr << "Config error (line " << line_number << "): Missing '=' in: " << trimmed_line << "\n";
+                continue;
+            }
+
+            std::string_view key = trim_whitespaces(trimmed_line.substr(0, separator_pos));
+            std::string_view value = trim_whitespaces(trimmed_line.substr(separator_pos + 1));
+
+            if (update_config(config, key, value))
+            {
+                updates++;
+            }
+        }
+
+        if (updates != EXPECTED_CONFIG_ENTRIES)
+        {
+            std::cerr << "Config warning: Expected " << EXPECTED_CONFIG_ENTRIES
+                      << " entries, but loaded " << updates << "\n";
+        }
+
+        return config;
+    }
 
     std::optional<Config> load_config(const std::string& _file_path)
     {
-        Config config;
-        std::ifstream file;
-        file.open(_file_path);
-        if (file.is_open())
-        {
-        }
-        else
+        std::ifstream file(_file_path);
+        if (!file.is_open())
         {
             file.open("./fela.conf");
         }
+
+        if (!file.is_open())
+        {
+            std::cerr << "Config error: Could not open '" << _file_path << "' or './fela.conf'\n";
+            return std::nullopt;
+        }
+
+        return parse_config(file);
     }
 } // fela

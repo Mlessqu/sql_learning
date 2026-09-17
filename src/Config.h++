@@ -17,5 +17,5 @@ namespace fela
     std::string_view trim_whitespaces(std::string_view _str_view);
     std::optional<Config> load_config(const std::string& _file_path);
     std::optional<Config> parse_config(std::ifstream& _file_stream);
-    bool update_config(const std::string_view& _key, const std::string_view& _val);
+    bool update_config(Config& _config, const std::string_view& _key, const std::string_view& _val);
 } // fela
