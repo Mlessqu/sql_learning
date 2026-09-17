@@ -1,0 +1,1 @@
+Learning project where I aimed to create credemtial system to learn databases, authorizations, http/https protocol etc, all that stuff new to me, so it was really interesting thing to build. Ended up doing as much as it is needed that I could at least pretend it could have real life use. 
